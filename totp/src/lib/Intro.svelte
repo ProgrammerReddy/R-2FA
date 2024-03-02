@@ -1,5 +1,10 @@
 <script lang="ts">
   import type { Links } from "types.ts";
+  import { invoke } from "@tauri-apps/api/tauri";
+
+  async function abort(): Promise<void> {
+    await invoke("abort");
+  }
 
   const links: Links[] = [
     {
@@ -38,7 +43,7 @@
     </div>
 
     <div class="mt-12 mb-6 to-center gap-5">
-      <button class="bg-gray-100 cta hover:bg-gray-300">Quit application</button>
+      <button class="bg-gray-100 cta hover:bg-gray-300" on:click={abort}>Quit application</button>
       <button class="bg-red-500 cta text-white hover:bg-red-600">Get started here</button>
     </div>
 

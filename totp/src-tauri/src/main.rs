@@ -3,6 +3,12 @@
 
 use tauri_plugin_positioner::{WindowExt, Position};
 use tauri::Manager;
+use std::process;
+
+#[tauri::command]
+fn abort() -> Result<(), i32> {
+    process::exit(0)
+}
 
 fn main() {
     tauri::Builder::default()
@@ -11,6 +17,7 @@ fn main() {
             let _ = window.move_window(Position::Center);
             Ok(())
         })
+        .invoke_handler(tauri::generate_handler![abort])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
