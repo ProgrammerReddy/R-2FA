@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .to-center {
+      @apply flex justify-center;
+  }
+
+  .preffered-color {
+    @apply text-black dark:text-white
+  }
+
+  .preffered-bg {
+    @apply w-full bg-white dark:bg-gray-800
+  }
+
+  .cta {
+    @apply p-3 rounded-3xl duration-300 ease-in-out
+  }
+}
