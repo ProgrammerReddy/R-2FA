@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Greet from "./lib/Greet.svelte";
+  import Intro from "./lib/Intro.svelte";
 </script>
 
 <main class="container">
@@ -12,6 +12,7 @@
   </div>
   <p>Click on the logo to see more.</p>
   <div class="row">
-    <Greet />
+    
   </div>
+  <Intro />
 </main>

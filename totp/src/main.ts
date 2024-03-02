@@ -1,8 +1,8 @@
-import "./styles.css";
+import "./tailwind.css";
 import App from "./App.svelte";
 
 const app: App = new App({
-  target: document.getElementById("app"),
+  target: document.getElementById("app")!,
 });
 
 export default app;
