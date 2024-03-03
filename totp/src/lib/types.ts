@@ -5,3 +5,9 @@ export type Links = {
   alt: string,
   width: number
 };
+
+export type ServiceToken = {
+  name: string,
+  icon: string,
+  token?: number,
+}

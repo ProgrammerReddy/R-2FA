@@ -4,7 +4,7 @@
   import Tokens from "./lib/Tokens.svelte";
 </script>
 
-<main class="preffered-bg">
+<main class="preffered-bg h-screen">
   <Router>
     <Route path="/" component={Intro} />
     <Route path="/tokens" component={Tokens} />
