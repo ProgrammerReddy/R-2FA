@@ -22,9 +22,9 @@
     </div>
 
     <div class="mt-12 mb-6 to-center gap-5 font-medium text-xl">
-      <button class="bg-gray-100 cta hover:bg-gray-300 shadow-md shadow-gray-50" on:click={abort}>Quit application</button>
-      <Link to="/tokens">
-        <button class="bg-red-500 cta text-white hover:bg-red-600 shadow-md shadow-orange-500">Get started here</button>
+      <button class="button-uncta cta" on:click={abort}>Quit application</button>
+      <Link to={"/tokens"}>
+        <button class="bg-red-500 cta text-white hover:bg-red-600 shadow-md shadow-red-500">Get started here</button>
       </Link>
     </div>
 
