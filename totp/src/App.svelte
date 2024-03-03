@@ -1,7 +1,12 @@
 <script lang="ts">
   import Intro from "./lib/Intro.svelte";
+  import { Router, Route } from "svelte-navigator";
+  import Tokens from "./lib/Tokens.svelte";
 </script>
 
 <main class="preffered-bg">
-  <Intro />
+  <Router>
+    <Route path="/" component={Intro} />
+    <Route path="/tokens" component={Tokens} />
+  </Router>
 </main>

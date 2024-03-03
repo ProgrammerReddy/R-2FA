@@ -1,34 +1,13 @@
 <script lang="ts">
-  import type { Links } from "types.ts";
   import { invoke } from "@tauri-apps/api/tauri";
+  import { message } from "@tauri-apps/api/dialog";
+  import { links } from "./links";
+  import { Link } from "svelte-navigator";
 
   async function abort(): Promise<void> {
+    await message("Reddy2FA - TOTP is succesfully been closed.");
     await invoke("abort");
   }
-
-  const links: Links[] = [
-    {
-      url: "https://github.com/RedIsGaming/Reddy2FA",
-      target: "_blank",
-      source: "/tauri.svg",
-      alt: "Tauri Logo",
-      width: 50
-    },
-    {
-      url: "https://github.com/RedIsGaming/Reddy2FA",
-      target: "_blank",
-      source: "/tauri.svg",
-      alt: "Tauri Logo",
-      width: 50
-    },
-    {
-      url: "https://github.com/RedIsGaming/Reddy2FA",
-      target: "_blank",
-      source: "/tauri.svg",
-      alt: "Tauri Logo",
-      width: 50
-    },
-  ];
 </script>
 
 <section class="to-center px-3 preffered-bg">
@@ -44,7 +23,9 @@
 
     <div class="mt-12 mb-6 to-center gap-5">
       <button class="bg-gray-100 cta hover:bg-gray-300" on:click={abort}>Quit application</button>
-      <button class="bg-red-500 cta text-white hover:bg-red-600">Get started here</button>
+      <Link to="/tokens">
+        <button class="bg-red-500 cta text-white hover:bg-red-600">Get started here</button>
+      </Link>
     </div>
 
     <div class="to-center gap-5 mb-6">
