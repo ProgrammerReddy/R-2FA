@@ -1,5 +1,5 @@
 {
-  "name": "totp2",
+  "name": "totp",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -15,6 +15,7 @@
     "svelte": "^4.2.18"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.1",
     "@iconify/svelte": "^4.0.2",
     "@rsbuild/core": "^0.7.8",
     "@rsbuild/plugin-svelte": "^0.7.8",
