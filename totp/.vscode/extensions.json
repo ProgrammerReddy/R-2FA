@@ -2,6 +2,13 @@
   "recommendations": [
     "svelte.svelte-vscode",
     "tauri-apps.tauri-vscode",
-    "rust-lang.rust-analyzer"
+    "rust-lang.rust-analyzer",
+    "bradlc.vscode-tailwindcss",
+    "tamasfe.even-better-toml",
+    "biomejs.biome",
+    "ms-vscode.vscode-typescript-next",
+    "csstools.postcss",
+    "usernamehw.errorlens",
+    "serayuzgur.crates",
   ]
 }

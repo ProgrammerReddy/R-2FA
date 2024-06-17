@@ -4,6 +4,7 @@
 use tauri_plugin_positioner::{WindowExt, Position};
 use tauri::Manager;
 use std::process;
+use totp::totp;
 
 #[tauri::command]
 fn abort() -> Result<(), i32> {
@@ -17,7 +18,7 @@ fn main() {
             let _ = window.move_window(Position::Center);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![abort])
+        .invoke_handler(tauri::generate_handler![abort, totp::generate_token])
         .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .expect("Error running the Tauri application.");
 }

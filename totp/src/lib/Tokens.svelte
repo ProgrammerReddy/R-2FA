@@ -18,7 +18,8 @@
             <Icon icon={token.icon} width={50} />
           </div>
 
-          <progress max={100} value={50}></progress>
+          <!--<progress max={100} value={50}></progress>-->
+          <p class="preffered-color mt-0 text-xl">{token.token}</p>
         </div>
       {/each}
 
