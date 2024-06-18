@@ -3,6 +3,7 @@
   import { message } from "@tauri-apps/api/dialog";
   import { links } from "./links";
   import { Link } from "svelte-navigator";
+  import RedIsGaming from "../../public/RedIsGaming.webp";
 
   async function abort(): Promise<void> {
     await message("Reddy2FA - TOTP is succesfully been closed.");
@@ -10,25 +11,25 @@
   }
 </script>
 
-<section class="to-center px-3 preffered-bg">
+<section class="px-3 to-center preffered-bg">
   <article class="my-14 w-auto text-center">
-    <h1 class="text-5xl font-medium preffered-color">Welcome to the Reddy2FA TOTP!</h1>
+    <h1 class="text-5xl font-medium preffered-color">Welcome to the R-2FA TOTP!</h1>
     <p class="mt-6 mb-12 text-2xl font-normal preffered-color">You can click on the button below to get started.</p>
 
     <div class="to-center">
-      <a href="https://github.com/RedIsGaming/Reddy2FA" target="_blank">
-        <figure><img src="/tauri.svg" alt="Tauri Logo" width="100" /></figure>
+      <a href="https://github.com/RedIsGaming/" target="_blank">
+        <figure><img src="{RedIsGaming}" alt="RedIsGaming profile" width="100" /></figure>
       </a>
     </div>
 
-    <div class="mt-12 mb-6 to-center gap-5 font-medium text-xl">
+    <div class="gap-5 mt-12 mb-6 text-xl font-medium to-center">
       <button class="button-uncta cta" on:click={abort}>Quit application</button>
       <Link to={"/tokens"}>
-        <button class="bg-red-500 cta text-white hover:bg-red-600 shadow-md shadow-red-500">Get started here</button>
+        <button class="text-white bg-red-500 shadow-md hover:bg-red-600 cta shadow-red-500">Get started here</button>
       </Link>
     </div>
 
-    <div class="to-center gap-5 mb-5">
+    <div class="gap-5 mb-5 to-center">
       {#each links as link}
         <a href={link.url} target={link.target}>
           <figure><img src={link.source} alt={link.alt} width={link.width} /></figure>
@@ -36,7 +37,7 @@
       {/each}
     </div>
 
-    <div class="to-center gap-1 preffered-color">
+    <div class="gap-1 to-center preffered-color">
       <strong>Copyright © 2024 All Rights Reserved -</strong>
       <p>Powered by RedIsGaming</p>
     </div>

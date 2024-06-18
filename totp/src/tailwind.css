@@ -4,7 +4,7 @@
 
 @layer components {
   .to-center {
-      @apply flex justify-center;
+    @apply flex justify-center;
   }
 
   .preffered-color {
@@ -12,7 +12,7 @@
   }
 
   .preffered-bg {
-    @apply w-full bg-white dark:bg-gray-800
+    @apply w-full bg-white dark:bg-gray-700
   }
 
   .cta {
