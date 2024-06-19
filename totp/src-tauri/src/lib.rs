@@ -1,3 +1,5 @@
+pub mod token;
+
 use totp_rs::Algorithm;
 
 #[derive(Debug)]

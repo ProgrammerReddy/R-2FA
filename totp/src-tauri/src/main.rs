@@ -1,55 +1,38 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{process, env};
-use totp::{Token, Otp};
-use db::*;
+use std::env;
+use totp::{Otp, token::*};
+use db::read_tokens;
 
 use tauri::Manager;
 use tauri_plugin_positioner::{WindowExt, Position};
 use totp_rs::{Algorithm, TOTP};
-use dotenv::dotenv;
-
-#[tauri::command]
-fn abort() -> Result<(), i32> {
-    process::exit(0)
-}
-
-fn env_as_token() -> Token {
-    let _ = dotenv().ok();
-    let issuer = read_tokens_issuer().join(", ");
-    let account_name = read_tokens_account_name();
-    let secret = read_tokens_secret();
-
-    Token::new(issuer, account_name, secret)
-}
-
-fn auth(token: Token, otp: Otp) -> String {
-    format!(
-        "otpauth://totp/{}:{}@?secret={}&issuer={}&algorithm={}&digits={}&period={}", 
-        token.issuer, 
-        token.account_name, 
-        token.secret, 
-        token.issuer, 
-        otp.algorithm, 
-        otp.digits, 
-        otp.step
-    )
-}
 
 #[tauri::command]
 fn generate_token() -> String {
     let token = env_as_token();
     let otp = Otp::new(Algorithm::SHA1, 6, 30);
-    let otpauth = auth(token, otp);
-    let totp = TOTP::from_url(otpauth).unwrap();
-    
-    totp.generate_current().unwrap_or_default()
+    let fetch = auth(token, otp);
+    let mut totp = Vec::new();
+
+    for _ in read_tokens().into_iter() {
+        let otpauth = fetch.clone();
+        let url = TOTP::from_url(otpauth).unwrap();
+        totp.push(url.generate_current().unwrap_or_default())
+    }
+
+    totp.join(", ")
 }
 
 #[tauri::command]
 fn show_tokens() -> String {
-    read_tokens_issuer().join(", ")
+    read_tokens().iter().map(|x| x.issuer.to_string()).collect()
+}
+
+#[tauri::command]
+fn token_length() -> usize {
+    read_tokens().iter().len()
 }
 
 fn main() {
@@ -59,7 +42,7 @@ fn main() {
             let _ = window.move_window(Position::Center);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![abort, generate_token, show_tokens])
+        .invoke_handler(tauri::generate_handler![generate_token, show_tokens, token_length])
         .run(tauri::generate_context!())
         .expect("Error running the Tauri application.");
 }
