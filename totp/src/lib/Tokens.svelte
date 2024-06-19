@@ -3,7 +3,6 @@
   import { invoke } from "@tauri-apps/api/tauri";
   import type { Token } from "./token";
   import Tokens from "./token";
-  import { Link } from "svelte-navigator";
   
   let totp = "";
   let step = 0;
@@ -40,9 +39,6 @@
   <article class="preffered-color">
     <article class="to-center items-center">
       <h1 class="h-24 flex items-center text-4xl font-bold pr-5">{tk}</h1>
-      <Link to={"/"}>
-        <Icon icon={"ion:home"} width={36} class="invert-0" />
-      </Link>
     </article>
 
     <article class="w-full">
