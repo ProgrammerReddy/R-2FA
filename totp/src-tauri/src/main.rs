@@ -30,9 +30,9 @@ fn auth(token: Token, otp: Otp) -> String {
         token.issuer, 
         token.account_name, 
         token.secret, 
-        token.issuer,
-        otp.algorithm,
-        otp.digits,
+        token.issuer, 
+        otp.algorithm, 
+        otp.digits, 
         otp.step
     )
 }
@@ -44,11 +44,7 @@ fn generate_token() -> String {
     let otpauth = auth(token, otp);
     let totp = TOTP::from_url(otpauth).unwrap();
     
-    let generate = read_tokens_id().into_iter().map(|_| {
-        totp.generate_current().unwrap_or_default()
-    }).collect::<Vec<String>>();
-    
-    generate.join(", ")
+    totp.generate_current().unwrap_or_default()
 }
 
 #[tauri::command]

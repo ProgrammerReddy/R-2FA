@@ -3,6 +3,7 @@
   import { invoke } from "@tauri-apps/api/tauri";
   import type { Token } from "./token";
   import Tokens from "./token";
+  import { Link } from "svelte-navigator";
   
   let totp = "";
   let step = 0;
@@ -33,6 +34,8 @@
   }
 
   const tk: string = "Overview of R-2FA TOTP tokens";
+  const new_token: string = "Add new token";
+  const size: number = 40;
 </script>
 
 <section class="preffered-bg">
@@ -42,15 +45,17 @@
     </article>
 
     <article class="w-full">
-      <div class="border-t-2 shadow-md h-14 flex items-center p-2 duration-200 hover:bg-red-50 hover:ease-in ease-out 
-        cursor-pointer dark:hover:bg-red-700">
-        <div class="w-1/12"><Icon icon="typcn:plus" width="40" height="40" /></div>
-        <div class="w-11/12"><p class="pl-4 text-xl">Add new token</p></div>
-      </div>
+      <Link to={"/new_token"}>
+        <div class="border-t-2 shadow-md h-14 flex items-center p-2 duration-200 hover:bg-red-50 hover:ease-in ease-out 
+          cursor-pointer dark:hover:bg-red-700">
+          <div class="w-1/12"><Icon icon="typcn:plus" width={size} height={size} /></div>
+          <p class="pl-4 text-xl w-11/12">{new_token}</p>
+        </div>
+      </Link>
       {#each tokens as tks}
         <div class="border-t-2 shadow-md h-14 flex items-center p-2 duration-200 hover:bg-red-50 hover:ease-in ease-out 
           cursor-pointer dark:hover:bg-red-700">
-          <div class="w-1/12"><Icon icon="{tks.icon}" width="40" height="40" /></div>
+          <div class="w-1/12"><Icon icon="{tks.icon}" width={size} height={size} /></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{tks.issuer}</p></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{tks.otp}</p></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{step}</p></div>
