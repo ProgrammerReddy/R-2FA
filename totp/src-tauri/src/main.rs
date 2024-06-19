@@ -2,8 +2,9 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{process, env};
-
 use totp::{Token, Otp};
+use db::*;
+
 use tauri::Manager;
 use tauri_plugin_positioner::{WindowExt, Position};
 use totp_rs::{Algorithm, TOTP};
@@ -16,9 +17,9 @@ fn abort() -> Result<(), i32> {
 
 fn env_as_token() -> Token {
     let _ = dotenv().ok();
-    let issuer = env::var("ISSUER").expect("Couldn't find the env variable.");
-    let account_name = env::var("ACCOUNT_NAME").expect("Couldn't find the env variable.");
-    let secret = env::var("SECRET").expect("Couldn't find the env variable");
+    let issuer = read_tokens_issuer().join(", ");
+    let account_name = read_tokens_account_name();
+    let secret = read_tokens_secret();
 
     Token::new(issuer, account_name, secret)
 }
@@ -43,7 +44,16 @@ fn generate_token() -> String {
     let otpauth = auth(token, otp);
     let totp = TOTP::from_url(otpauth).unwrap();
     
-    totp.generate_current().unwrap_or_default()
+    let generate = read_tokens_id().into_iter().map(|_| {
+        totp.generate_current().unwrap_or_default()
+    }).collect::<Vec<String>>();
+    
+    generate.join(", ")
+}
+
+#[tauri::command]
+fn show_tokens() -> String {
+    read_tokens_issuer().join(", ")
 }
 
 fn main() {
@@ -53,7 +63,7 @@ fn main() {
             let _ = window.move_window(Position::Center);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![abort, generate_token])
+        .invoke_handler(tauri::generate_handler![abort, generate_token, show_tokens])
         .run(tauri::generate_context!())
         .expect("Error running the Tauri application.");
 }

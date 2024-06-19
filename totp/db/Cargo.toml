@@ -1,0 +1,9 @@
+[package]
+name = "db"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel = { version = "2.2.1", features = ["postgres"]}
+diesel_migrations = "2.2.0"
+dotenv = "0.15.0"
