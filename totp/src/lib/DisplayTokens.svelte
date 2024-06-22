@@ -12,7 +12,8 @@
 
   async function invoke_token(): Promise<void> {
     const period: number = 30;
-    step = (new Date().getSeconds() < period) ? period - new Date().getSeconds() : period * 2 - new Date().getSeconds();
+    const seconds = new Date().getSeconds();
+    step = (seconds < period) ? period - seconds : period * 2 - seconds;
 
     totp = await invoke("generate_token");
     token_issuer = await invoke("show_tokens");
@@ -27,7 +28,7 @@
   let tokens: Token[] = [];
 
   $: if (totp) {
-    tokens = Tokens.new([{ issuer: token_issuer, icon: "vscode-icons:file-type-objidconfig", otp: totp }]);
+    tokens = Tokens.new([{ issuer: token_issuer, placeholder: "vscode-icons:file-type-objidconfig", otp: totp }]);
   }
   $: mapped_tokens = tokens.flatMap((x: Token) => Array.from({ length: token_length }).map(() => x));
 
@@ -54,7 +55,7 @@
       {#each mapped_tokens as tks}
         <div class="border-t-2 shadow-md h-14 flex items-center p-2 duration-200 hover:bg-red-50 hover:ease-in ease-out 
           cursor-pointer dark:hover:bg-red-700">
-          <div class="w-1/12"><Icon icon="{tks.icon}" width={size} height={size} /></div>
+          <div class="w-1/12"><Icon icon="{tks.placeholder}" width={size} height={size} /></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{tks.issuer}</p></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{tks.otp}</p></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{step}</p></div>

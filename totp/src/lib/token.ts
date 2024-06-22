@@ -1,7 +1,9 @@
 export type Token = {
-  issuer: string,
-  icon: string,
-  otp: string,
+  name?: string,
+  issuer?: string,
+  placeholder: string,
+  otp?: string,
+  label_input_name?: string,
 }
 
 const Tokens = {

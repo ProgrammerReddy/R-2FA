@@ -3,7 +3,7 @@
 
 use std::env;
 use totp::{Otp, token::*};
-use db::read_tokens;
+use db::{read_tokens, create_tokens};
 
 use tauri::Manager;
 use tauri_plugin_positioner::{WindowExt, Position};
@@ -35,6 +35,12 @@ fn token_length() -> usize {
     read_tokens().iter().len()
 }
 
+#[tauri::command(rename_all = "snake_case")]
+fn submit_token(new_token: Vec<String>) -> String {
+    create_tokens(new_token.first().unwrap(), new_token[1].as_str(), new_token.last().unwrap());
+    new_token.join(", ")
+}
+
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
@@ -42,7 +48,7 @@ fn main() {
             let _ = window.move_window(Position::Center);
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![generate_token, show_tokens, token_length])
+        .invoke_handler(tauri::generate_handler![generate_token, show_tokens, token_length, submit_token])
         .run(tauri::generate_context!())
         .expect("Error running the Tauri application.");
 }

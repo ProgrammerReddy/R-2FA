@@ -1,12 +1,12 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
-  import Tokens from "./lib/Tokens.svelte";
+  import DisplayTokens from "./lib/DisplayTokens.svelte";
   import AddToken from "./lib/AddToken.svelte";
 </script>
 
-<main class="h-screen preffered-bg">
+<main class="totp">
   <Router>
-    <Route path="/" component={Tokens} />
+    <Route path="/" component={DisplayTokens} />
     <Route path="/new_token" component={AddToken} />
   </Router>
 </main>

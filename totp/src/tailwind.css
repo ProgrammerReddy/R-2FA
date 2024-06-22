@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 @layer components {
+  .totp {
+    @apply h-screen preffered-bg;
+  }
+
   .to-center {
     @apply flex justify-center;
   }
@@ -15,19 +19,23 @@
     @apply w-full bg-white dark:bg-gray-700
   }
 
-  .cta {
-    @apply p-3 rounded-3xl duration-300 ease-in-out
+  .token_form_label {
+    @apply inline-block mb-3 text-lg;
   }
 
-  .token {
-    @apply border-red-500 border-2 rounded-2xl px-9 bg-gray-50 dark:bg-gray-900 shadow-lg shadow-red-500 py-6
+  .token_form_input {
+    @apply text-black rounded-2xl shadow-md w-full p-3 placeholder:text-lg outline outline-red-600 outline-1;
   }
 
-  .button-uncta {
-    @apply bg-gray-100 hover:bg-gray-300 shadow-md shadow-gray-50
+  .token_form {
+    @apply p-3 grid grid-cols-1 gap-5;
   }
 
-  .add-token {
-    @apply p-3 w-full rounded-3xl placeholder:text-gray-500 bg-gray-100 dark:text-gray-500
+  .token_form_button {
+    @apply bg-red-600 w-1/5 h-10 rounded-2xl text-lg font-semibold text-white;
+  }
+
+  .token_form_h2 {
+    @apply text-3xl font-semibold;
   }
 }
