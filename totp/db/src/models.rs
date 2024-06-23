@@ -1,7 +1,8 @@
-use diesel::{deserialize::Queryable, pg, prelude::Insertable, Selectable};
 use crate::schema::tokens;
+use diesel::{deserialize::Queryable, pg, prelude::Insertable, Selectable};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Queryable, Selectable)]
+#[derive(Debug, Queryable, Selectable, Serialize, Deserialize)]
 #[diesel(table_name = tokens)]
 #[diesel(check_for_backend(pg::Pg))]
 pub struct Token {

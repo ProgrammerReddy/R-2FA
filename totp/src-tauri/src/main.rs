@@ -1,12 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use db::{create_tokens, read_tokens, delete_tokens, models::Token};
 use std::env;
-use totp::{Otp, token::*};
-use db::{read_tokens, create_tokens};
-
+use totp::{token::*, Otp};
 use tauri::Manager;
-use tauri_plugin_positioner::{WindowExt, Position};
+use tauri_plugin_positioner::{Position, WindowExt};
 use totp_rs::{Algorithm, TOTP};
 
 #[tauri::command]
@@ -26,29 +25,37 @@ fn generate_token() -> String {
 }
 
 #[tauri::command]
-fn show_tokens() -> String {
-    read_tokens().iter().map(|x| x.issuer.to_string()).collect()
-}
-
-#[tauri::command]
-fn token_length() -> usize {
-    read_tokens().iter().len()
+fn show_token() -> Vec<Token> {
+    read_tokens()
 }
 
 #[tauri::command(rename_all = "snake_case")]
-fn submit_token(new_token: Vec<String>) -> String {
-    create_tokens(new_token.first().unwrap(), new_token[1].as_str(), new_token.last().unwrap());
-    new_token.join(", ")
+fn submit_token(new_token: Vec<String>) {
+    create_tokens(
+        new_token.first().unwrap(),
+        new_token[1].as_str(),
+        new_token.last().unwrap(),
+    );
+}
+
+#[tauri::command(rename_all = "snake_case")]
+fn drop_token(remove_id: i32) -> usize {
+    delete_tokens(remove_id)
 }
 
 fn main() {
     tauri::Builder::default()
         .setup(|app| {
             let window = app.get_window("main").unwrap();
-            let _ = window.move_window(Position::Center);
+            window.move_window(Position::Center).unwrap_or_default();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![generate_token, show_tokens, token_length, submit_token])
+        .invoke_handler(tauri::generate_handler![
+            generate_token,
+            show_token,
+            submit_token,
+            drop_token,
+        ])
         .run(tauri::generate_context!())
         .expect("Error running the Tauri application.");
 }

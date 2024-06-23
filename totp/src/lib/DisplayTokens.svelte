@@ -1,64 +1,72 @@
 <script lang="ts">
   import Icon from "@iconify/svelte";
   import { invoke } from "@tauri-apps/api/tauri";
-  import type { Token } from "./token";
+  import type { Token, StructToken } from "./token";
   import Tokens from "./token";
   import { Link } from "svelte-navigator";
-  
+
   let totp = "";
   let step = 0;
-  let token_issuer = "";
-  let token_length: number;
+  let struct_token: Array<StructToken> = Array.from([]);
+  const size: number = 40;
 
-  async function invoke_token(): Promise<void> {
+  async function display_tokens(): Promise<void> {
     const period: number = 30;
     const seconds = new Date().getSeconds();
-    step = (seconds < period) ? period - seconds : period * 2 - seconds;
+    step = seconds < period ? period - seconds : period * 2 - seconds;
 
     totp = await invoke("generate_token");
-    token_issuer = await invoke("show_tokens");
-    token_length = await invoke("token_length");
-  };
+    struct_token = await invoke("show_token");
+  }
 
   function token_timer(): void {
-    setInterval(invoke_token, 1000);
+    const delay: number = 1000;
+    setInterval(display_tokens, delay);
   }
 
   token_timer();
   let tokens: Token[] = [];
 
   $: if (totp) {
-    tokens = Tokens.new([{ issuer: token_issuer, placeholder: "vscode-icons:file-type-objidconfig", otp: totp }]);
+    tokens = Tokens.new([
+      {
+        issuer: struct_token.map((x: StructToken) => x.issuer).join(" "),
+        placeholder: "vscode-icons:file-type-objidconfig",
+        otp: totp,
+      },
+    ]);
   }
-  $: mapped_tokens = tokens.flatMap((x: Token) => Array.from({ length: token_length }).map(() => x));
 
-  const tk: string = "Overview of R-2FA TOTP tokens";
-  const new_token: string = "Add new token";
-  const size: number = 40;
+  $: mapped_tokens = tokens.flatMap((x: Token) =>
+    Array.from({ length: struct_token.length }).map(() => x),
+  );
+
+  $: remove_token = async (): Promise<void> => {
+    await invoke("drop_token", { remove_id: struct_token.map((x: StructToken) => x.id) });
+  }
 </script>
 
 <section class="preffered-bg">
   <article class="preffered-color">
-    <article class="to-center items-center">
-      <h1 class="h-24 flex items-center text-4xl font-bold pr-5">{tk}</h1>
+    <article class="items-center to-center">
+      <h1 class="flex items-center pr-5 h-24 text-4xl font-bold">Overview of R-2FA TOTP tokens</h1>
     </article>
 
     <article class="w-full">
       <Link to={"/new_token"}>
-        <div class="border-t-2 shadow-md h-14 flex items-center p-2 duration-200 hover:bg-red-50 hover:ease-in ease-out 
-          cursor-pointer dark:hover:bg-red-700">
+        <div class="flex items-center p-2 h-14 border-t-2 shadow-md duration-200 ease-out cursor-pointer hover:bg-red-50 hover:ease-in dark:hover:bg-red-700">
           <div class="w-1/12"><Icon icon="typcn:plus" width={size} height={size} /></div>
-          <p class="pl-4 text-xl w-11/12">{new_token}</p>
+          <p class="pl-4 w-11/12 text-xl">Add new token</p>
         </div>
       </Link>
 
       {#each mapped_tokens as tks}
-        <div class="border-t-2 shadow-md h-14 flex items-center p-2 duration-200 hover:bg-red-50 hover:ease-in ease-out 
-          cursor-pointer dark:hover:bg-red-700">
+        <div class="flex items-center p-2 h-14 border-t-2 shadow-md duration-200 ease-out cursor-pointer hover:bg-red-50 hover:ease-in dark:hover:bg-red-700">
           <div class="w-1/12"><Icon icon="{tks.placeholder}" width={size} height={size} /></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{tks.issuer}</p></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{tks.otp}</p></div>
           <div class="w-1/6"><p class="pl-4 text-xl">{step}</p></div>
+          <Icon icon="mdi:bin-empty" class="text-red-600 dark:text-white" on:click={remove_token} width={size} height={size} />
         </div>
       {/each}
     </article>

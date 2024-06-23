@@ -7,3 +7,4 @@ edition = "2021"
 diesel = { version = "2.2.1", features = ["postgres"]}
 diesel_migrations = "2.2.0"
 dotenv = "0.15.0"
+serde = "1.0.203"
