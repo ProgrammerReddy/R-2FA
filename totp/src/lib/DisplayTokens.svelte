@@ -5,7 +5,7 @@
   import Tokens from "./token";
   import { Link } from "svelte-navigator";
 
-  let totp = "";
+  let totp: Array<string> = Array.from([]);
   let step = 0;
   let struct_token: Array<StructToken> = Array.from([]);
   const size: number = 40;
@@ -32,7 +32,7 @@
       {
         issuer: struct_token.map((x: StructToken) => x.issuer).join(" "),
         placeholder: "vscode-icons:file-type-objidconfig",
-        otp: totp,
+        otp: totp.join(" "),
       },
     ]);
   }

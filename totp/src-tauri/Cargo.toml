@@ -14,8 +14,8 @@ tauri-build = { version = "1.5", features = [] }
 tauri = { version = "1.5", features = ["shell-open"] }
 tauri-plugin-positioner = "1.0.4"
 totp-rs = { version = "5.5.1", features = ["otpauth"] }
-dotenv = "0.15.0"
 db = { path = "../db" }
+serde = "1.0.203"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

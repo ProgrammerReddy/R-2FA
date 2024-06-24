@@ -1,6 +1,8 @@
 pub mod token;
 
-use totp_rs::Algorithm;
+use serde::{Serialize, Serializer};
+use std::time::SystemTimeError;
+use totp_rs::{Algorithm, TotpUrlError};
 
 #[derive(Debug)]
 pub struct Token {
@@ -32,6 +34,37 @@ impl Otp {
             algorithm,
             digits,
             step,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum TotpError {
+    UrlError(TotpUrlError),
+    STError(SystemTimeError),
+}
+
+impl From<TotpUrlError> for TotpError {
+    fn from(value: TotpUrlError) -> Self {
+        Self::UrlError(value)
+    }
+}
+
+impl From<SystemTimeError> for TotpError {
+    fn from(value: SystemTimeError) -> Self {
+        Self::STError(value)
+    }
+}
+
+impl Serialize for TotpError {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        match *self {
+            TotpError::UrlError(ref err) => serializer.serialize_newtype_variant(
+                "TotpError", 0, "UrlError", &err.to_string()
+            ),
+            TotpError::STError(ref err) => serializer.serialize_newtype_variant(
+                "TotpError", 1, "STError", &err.to_string()
+            ),
         }
     }
 }

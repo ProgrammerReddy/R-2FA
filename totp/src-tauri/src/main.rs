@@ -3,13 +3,13 @@
 
 use db::{create_tokens, read_tokens, delete_tokens, models::Token};
 use std::env;
-use totp::{token::*, Otp};
-use tauri::Manager;
+use totp::{token::*, Otp, TotpError};
+use tauri::{Error, Manager};
 use tauri_plugin_positioner::{Position, WindowExt};
 use totp_rs::{Algorithm, TOTP};
 
 #[tauri::command]
-fn generate_token() -> String {
+fn generate_token() -> Result<Vec<String>, TotpError> {
     let token = env_as_token();
     let otp = Otp::new(Algorithm::SHA1, 6, 30);
     let fetch = auth(token, otp);
@@ -17,37 +17,39 @@ fn generate_token() -> String {
 
     for _ in read_tokens().into_iter() {
         let otpauth = fetch.clone();
-        let url = TOTP::from_url(otpauth).unwrap();
-        totp.push(url.generate_current().unwrap_or_default())
+        let url = TOTP::from_url(otpauth).map_err(TotpError::UrlError)?;
+        totp.push(url.generate_current().map_err(TotpError::STError)?)
     }
 
-    totp.join(", ")
+    Ok(totp)
 }
 
 #[tauri::command]
-fn show_token() -> Vec<Token> {
-    read_tokens()
+fn show_token() -> Result<Vec<Token>, ()> {
+    Ok(read_tokens().unwrap_or_default())
 }
 
 #[tauri::command(rename_all = "snake_case")]
 fn submit_token(new_token: Vec<String>) {
     create_tokens(
-        new_token.first().unwrap(),
+        new_token.first().map(|x| x.as_str()).unwrap(),
         new_token[1].as_str(),
-        new_token.last().unwrap(),
-    );
+        new_token.last().map(|x| x.as_str()).unwrap(),
+    ).unwrap_or_default();
 }
 
 #[tauri::command(rename_all = "snake_case")]
-fn drop_token(remove_id: i32) -> usize {
-    delete_tokens(remove_id)
+fn drop_token(remove_id: i32) -> Result<usize, ()> {
+    Ok(delete_tokens(remove_id).unwrap_or_default())
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     tauri::Builder::default()
         .setup(|app| {
-            let window = app.get_window("main").unwrap();
-            window.move_window(Position::Center).unwrap_or_default();
+            let window = app.get_window("main")
+                .ok_or("Tauri window couldn't be found.")?;
+
+            window.move_window(Position::Center)?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -56,6 +58,7 @@ fn main() {
             submit_token,
             drop_token,
         ])
-        .run(tauri::generate_context!())
-        .expect("Error running the Tauri application.");
+        .run(tauri::generate_context!())?;
+
+    Ok(())
 }
