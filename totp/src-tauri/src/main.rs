@@ -25,22 +25,22 @@ fn generate_token() -> Result<Vec<String>, TotpError> {
 }
 
 #[tauri::command]
-fn show_token() -> Result<Vec<Token>, ()> {
-    Ok(read_tokens().unwrap_or_default())
+fn show_token() -> Vec<Token> {
+    read_tokens().unwrap_or_default()
 }
 
 #[tauri::command(rename_all = "snake_case")]
-fn submit_token(new_token: Vec<String>) {
-    create_tokens(
-        new_token.first().map(|x| x.as_str()).unwrap(),
+fn submit_token(new_token: Vec<String>) -> Option<Vec<Token>> {
+    Some(create_tokens(
+        new_token.first()?,
         new_token[1].as_str(),
-        new_token.last().map(|x| x.as_str()).unwrap(),
-    ).unwrap_or_default();
+        new_token.last()?,
+    ).unwrap_or_default())
 }
 
 #[tauri::command(rename_all = "snake_case")]
-fn drop_token(remove_id: i32) -> Result<usize, ()> {
-    Ok(delete_tokens(remove_id).unwrap_or_default())
+fn drop_token(remove_id: i32) -> usize {
+    delete_tokens(remove_id).unwrap_or_default()
 }
 
 fn main() -> Result<(), Error> {

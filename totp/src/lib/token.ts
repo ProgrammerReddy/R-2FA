@@ -1,9 +1,8 @@
 export type Token = {
-  name?: string,
-  issuer?: string,
+  id: number,
   placeholder: string,
-  otp?: string,
-  label_input_name?: string,
+  issuer: string,
+  otp: string,
 };
 
 export type StructToken = {
@@ -12,9 +11,3 @@ export type StructToken = {
   issuer: string,
   secret: string,
 };
-
-const Tokens = {
-  new: (token: Token[]): Token[] => token,
-};
-
-export default Tokens;
