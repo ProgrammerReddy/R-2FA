@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use db::{create_tokens, read_tokens, delete_tokens, models::Token};
+use db::{create_tokens, read_tokens, delete_tokens, models::Token, establish_connection};
 use std::env;
 use totp::{token::*, Otp, TotpError};
 use tauri::{Error, Manager};
@@ -14,8 +14,9 @@ fn generate_token() -> Result<Vec<String>, TotpError> {
     let otp = Otp::new(Algorithm::SHA1, 6, 30);
     let fetch = auth(token, otp);
     let mut totp = Vec::new();
+    let connection = establish_connection();
 
-    for _ in read_tokens().into_iter() {
+    for _ in read_tokens(connection).into_iter() {
         let otpauth = fetch.clone();
         let url = TOTP::from_url(otpauth).map_err(TotpError::UrlError)?;
         totp.push(url.generate_current().map_err(TotpError::STError)?)
@@ -26,21 +27,26 @@ fn generate_token() -> Result<Vec<String>, TotpError> {
 
 #[tauri::command]
 fn show_token() -> Vec<Token> {
-    read_tokens().unwrap_or_default()
+    let connection = establish_connection();
+    read_tokens(connection).unwrap_or_default()
 }
 
 #[tauri::command(rename_all = "snake_case")]
 fn submit_token(new_token: Vec<String>) -> Option<Vec<Token>> {
+    let connection = establish_connection();
+
     Some(create_tokens(
         new_token.first()?,
         new_token[1].as_str(),
         new_token.last()?,
+        connection
     ).unwrap_or_default())
 }
 
 #[tauri::command(rename_all = "snake_case")]
 fn drop_token(remove_id: i32) -> usize {
-    delete_tokens(remove_id).unwrap_or_default()
+    let connection = establish_connection();
+    delete_tokens(remove_id, connection).unwrap_or_default()
 }
 
 fn main() -> Result<(), Error> {

@@ -1,21 +1,21 @@
 use crate::{Otp, Token};
-use db::read_tokens;
+use db::{establish_connection, read_tokens};
 
 pub fn env_as_token() -> Token {
-    let issuer = read_tokens()
-        .unwrap_or_default()
+    let connection = establish_connection();
+    let select_tokens = read_tokens(connection).unwrap_or_default();
+
+    let issuer = select_tokens
         .iter()
         .map(|x| x.issuer.to_string())
         .collect();
 
-    let account_name = read_tokens()
-        .unwrap_or_default()
+    let account_name = select_tokens
         .iter()
         .map(|x| x.account_name.to_string())
         .collect();
 
-    let secret = read_tokens()
-        .unwrap_or_default()
+    let secret = select_tokens
         .iter()
         .map(|x| x.secret.to_string())
         .collect();

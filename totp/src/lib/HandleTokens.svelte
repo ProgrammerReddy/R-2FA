@@ -4,7 +4,6 @@
   import type { Token, StructToken } from "./token";
 
   export let size: number;
-
   let totp: Array<string> = Array.from([]);
   let step = 0;
   let struct_token: Array<StructToken> = Array.from([]);
@@ -26,8 +25,11 @@
   $: if (struct_token.length > 0) {
     tokens = [];
 
-    struct_token.map((x: StructToken) => {
-      tokens.push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: totp.join(" ") });
+    // biome-ignore lint/complexity/noForEach: <why making it yourself harder with a for of instead of a forEach?>
+    struct_token.forEach((x: StructToken) => {
+      tokens
+        .sort((a: Token, b: Token) => a.issuer.localeCompare(b.issuer))
+        .push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: totp.join(" ") });
     });
   }
 

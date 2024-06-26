@@ -24,11 +24,11 @@
   }
 
   .token_form_input {
-    @apply text-black rounded-2xl shadow-md w-full p-3 placeholder:text-lg outline outline-red-600 outline-1;
+    @apply text-black rounded-2xl shadow-md w-full p-3 placeholder:text-lg outline outline-red-600 outline-1 mb-3;
   }
 
   .token_form_button {
-    @apply bg-red-600 w-1/5 h-10 rounded-2xl text-lg font-semibold text-white;
+    @apply bg-red-600 w-1/5 h-10 rounded-2xl text-lg font-semibold text-white duration-200 ease-in-out;
   }
 
   .display_handle_add_tokens {

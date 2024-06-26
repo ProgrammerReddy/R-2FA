@@ -9,7 +9,7 @@ use dotenv::dotenv;
 use models::{NewToken, Token};
 use std::env::{self, VarError};
 
-fn establish_connection() -> Result<PgConnection, VarError> {
+pub fn establish_connection() -> Result<PgConnection, VarError> {
     dotenv().ok();
 
     let pg_username = env::var("PGUSERNAME")?;
@@ -23,30 +23,31 @@ fn establish_connection() -> Result<PgConnection, VarError> {
     )
 }
 
-pub fn read_tokens() -> Result<Vec<Token>, Error> {
+pub fn read_tokens(connection: Result<PgConnection, VarError>) -> Result<Vec<Token>, Error> {
     use self::schema::tokens::dsl::*;
-
-    let mut connection = establish_connection().unwrap();
     
     tokens
         .select(Token::as_select())
-        .load::<Token>(&mut connection)
+        .load::<Token>(&mut connection.unwrap())
 }
 
-pub fn create_tokens<'a>(account_name: &'a str, issuer: &'a str, secret: &'a str) -> Result<Vec<Token>, Error> {
-    let mut connection = establish_connection().unwrap();
+pub fn create_tokens<'a>(
+    account_name: &'a str, 
+    issuer: &'a str, 
+    secret: &'a str, 
+    connection: Result<PgConnection, VarError>
+) -> Result<Vec<Token>, Error> {
+    
     let new_token = NewToken::new(account_name, issuer, secret);
 
     diesel::insert_into(tokens::table)
         .values(new_token)
         .returning(Token::as_returning())
-        .get_results(&mut connection)
+        .get_results(&mut connection.unwrap())
 }
 
-pub fn delete_tokens(id: i32) -> Result<usize, Error> {
-    let mut connection = establish_connection().unwrap();
-
+pub fn delete_tokens(id: i32, connection: Result<PgConnection, VarError>) -> Result<usize, Error> {
     diesel::delete(tokens::table)
         .filter(tokens::id.eq(id))
-        .execute(&mut connection)
+        .execute(&mut connection.unwrap())
 }
