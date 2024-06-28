@@ -13,7 +13,7 @@ fn generate_token() -> Result<Vec<String>, TotpError> {
     let token = env_as_token();
     let otp = Otp::new(Algorithm::SHA1, 6, 30);
     let fetch = auth(token, otp);
-    let mut totp = Vec::new();
+    let mut totp: Vec<String> = Vec::new();
     let connection = establish_connection();
 
     for _ in read_tokens(connection).into_iter() {

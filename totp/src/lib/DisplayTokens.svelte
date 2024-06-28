@@ -14,7 +14,7 @@
 
     <article class="w-full">
       <Link to={"/new_token"}>
-        <div class="display_handle_add_tokens">
+        <div class="display_handle_add_tokens cursor-pointer hover:bg-red-50 hover:ease-in dark:hover:bg-red-700">
           <div class="w-1/12"><Icon icon="typcn:plus" width={size} height={size} /></div>
           <p class="display_add_tokens_p">Add new token</p>
         </div>

@@ -16,7 +16,9 @@
   const bytes: number = new Blob([JSON.stringify(check)]).size + 1;
   const bits: number = 7;
   const regex: RegExp = /^[a-z0-9$,@#.^%-]+$/i;
+  const base32: RegExp = /^[a-z2-7]+$/i;
   const unmatch_regex: string = "Can only contain alphanumeric types or the following characters: [$,@#.^%-]!";
+  const unmatch_base32: string = "Can only contain base32 types: [a-z, A-Z, 2-7]!";
   const empty: string = "Cannot be empty!";
   const character_limit: string = "Is to long!";
 
@@ -30,7 +32,8 @@
 
   $: secret_err = secret.length === 0 ? empty : !secret.match(regex)
     ? unmatch_regex : secret.length > 64
-    ? character_limit : check;
+    ? character_limit : !secret.match(base32) 
+    ? unmatch_base32 : check;
   
   $: errors = Array.from([account_name_err, issuer_err, secret_err]);
   $: disabled = (): boolean => new Blob([JSON.stringify(errors)]).size !== bits + bytes * (errors.length - 1);
@@ -41,7 +44,7 @@
       return;
     }
     
-    await invoke("submit_token", { new_token: token })
+    await invoke("submit_token", { new_token: token });
   };
 </script>
 
@@ -49,7 +52,7 @@
   <h2 class="text-3xl font-semibold">Create new token</h2>
 
   <div>
-    <label for="account" class="token_form_label">Account name: {account_name_err}</label>
+    <label for="account" class="token_form_label">Account name:&nbsp <p class="token_form_p">{account_name_err}</p></label>
     <input 
       id="account" 
       name={"account_name"} 
@@ -58,9 +61,9 @@
       bind:value={account_name}
     />
 
-    <label for="institution" class="token_form_label">Issuer: {issuer_err}</label>
+    <label for="institution" class="token_form_label">Issuer:&nbsp <p class="token_form_p">{issuer_err}</p></label>
     <input id="institution" name={"issuer"} placeholder="Enter your issuer here." class="token_form_input" bind:value={issuer} />
-    <label for="key" class="token_form_label">Secret: {secret_err}</label>
+    <label for="key" class="token_form_label">Secret:&nbsp <p class="token_form_p">{secret_err}</p></label>
     <input id="key" name={"secret"} placeholder="Enter your secret here." class="token_form_input" bind:value={secret} />
   </div>
 

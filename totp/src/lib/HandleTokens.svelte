@@ -2,8 +2,10 @@
   import Icon from "@iconify/svelte";
   import { invoke } from "@tauri-apps/api/tauri";
   import type { Token, StructToken } from "./token";
+  import RemoveToken from "./RemoveToken.svelte";
 
   export let size: number;
+  
   let totp: Array<string> = Array.from([]);
   let step = 0;
   let struct_token: Array<StructToken> = Array.from([]);
@@ -11,10 +13,20 @@
 
   async function display_tokens(): Promise<void> {
     const period: number = 30;
-    const seconds = new Date().getSeconds();
+    const seconds: number = new Date().getSeconds();
     step = seconds < period ? period - seconds : period * 2 - seconds;
+    
+    try {
+      totp = await invoke("generate_token");
+    }
 
-    totp = await invoke("generate_token");
+    catch (err: unknown) {
+      if (err instanceof Object) {
+        console.log(err);
+        totp = Array.from(["unknown token"]);
+      }
+    }
+
     struct_token = await invoke("show_token");
   }
 
@@ -33,18 +45,31 @@
     });
   }
 
-  $: remove_token = async (id: number): Promise<void> => await invoke("drop_token", { remove_id: id });
+  let show_dialog = false;
+  let token_id: number | null;
+
+  function confirm_remove(id: number | null): void {
+    token_id = id;
+    
+    show_dialog = !show_dialog;
+    const dialog: HTMLDialogElement = document.getElementById("dialog-state") as HTMLDialogElement;
+    dialog != null ? dialog.showModal() : null;
+  };
 </script>
 
 {#each tokens as tks}
   <div class="display_handle_add_tokens">
-    <div class="w-[10%]"><Icon icon="{tks.placeholder}" width={size} height={size} /></div>
-    <div class="w-1/5"><p class="display_add_tokens_p w-auto">{tks.issuer}</p></div>
-    <div class="w-1/5"><p class="display_add_tokens_p w-auto">{tks.otp}</p></div>
-    <div class="w-1/5"><p class="display_add_tokens_p w-auto">{step}</p></div>
+    <div class="w-[8.33%]"><Icon icon="{tks.placeholder}" width={size} height={size} /></div>
+    <div class="w-1/4"><p class="display_add_tokens_p w-auto">{tks.issuer}</p></div>
+    <div class="w-1/4"><p class="display_add_tokens_p w-auto">{tks.otp}</p></div>
+    <div class="w-1/4"><p class="display_add_tokens_p w-auto">{step}</p></div>
 
-    <button on:click={() => remove_token(tks.id)}>
+    <button on:click={() => confirm_remove(tks.id)}>
       <Icon icon="mdi:bin-empty" class="handle_tokens_icon" width={size} height={size} />
     </button>
   </div>
 {/each}
+
+{#if show_dialog}
+  <RemoveToken id={token_id} close_dialog={show_dialog} />
+{/if}

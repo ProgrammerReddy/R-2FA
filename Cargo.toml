@@ -1,3 +1,10 @@
 [workspace]
 resolver = "2"
 members = ["totp/db", "totp/src-tauri"]
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+opt-level = "z"
+panic = "abort"
