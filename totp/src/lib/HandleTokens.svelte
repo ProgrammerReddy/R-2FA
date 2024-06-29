@@ -3,10 +3,12 @@
   import { invoke } from "@tauri-apps/api/tauri";
   import type { Token, StructToken } from "./token";
   import RemoveToken from "./RemoveToken.svelte";
+  import { option, some } from "./option";
+  import type { Some } from "./option";
 
   export let size: number;
   
-  let totp: Array<string> = Array.from([]);
+  let totp: Some<string[]> = some([""]);
   let step = 0;
   let struct_token: Array<StructToken> = Array.from([]);
   let tokens: Array<Token> = Array.from([]);
@@ -15,18 +17,8 @@
     const period: number = 30;
     const seconds: number = new Date().getSeconds();
     step = seconds < period ? period - seconds : period * 2 - seconds;
-    
-    try {
-      totp = await invoke("generate_token");
-    }
-
-    catch (err: unknown) {
-      if (err instanceof Object) {
-        console.log(err);
-        totp = Array.from(["unknown token"]);
-      }
-    }
-
+  
+    totp = await option(Promise.all([invoke("generate_token")])) as Some<string[]>;
     struct_token = await invoke("show_token");
   }
 
@@ -41,7 +33,7 @@
     struct_token.forEach((x: StructToken) => {
       tokens
         .sort((a: Token, b: Token) => a.issuer.localeCompare(b.issuer))
-        .push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: totp.join(" ") });
+        .push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: totp.value.join() });
     });
   }
 
