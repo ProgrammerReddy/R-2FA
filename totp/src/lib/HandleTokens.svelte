@@ -3,12 +3,12 @@
   import { invoke } from "@tauri-apps/api/tauri";
   import type { Token, StructToken } from "./token";
   import RemoveToken from "./RemoveToken.svelte";
-  import { option, some } from "./option";
+  import { option, some, none } from "./option";
   import type { Some } from "./option";
 
   export let size: number;
   
-  let totp: Some<string[]> = some([""]);
+  let totp: Some<string[]> = some([]);
   let step = 0;
   let struct_token: Array<StructToken> = Array.from([]);
   let tokens: Array<Token> = Array.from([]);
@@ -28,12 +28,13 @@
 
   $: if (struct_token.length > 0) {
     tokens = [];
+    const handle_totp: string = Array.isArray(totp.value) ? totp.value.join() : none;
 
     // biome-ignore lint/complexity/noForEach: <why making it yourself harder with a for of instead of a forEach?>
     struct_token.forEach((x: StructToken) => {
       tokens
         .sort((a: Token, b: Token) => a.issuer.localeCompare(b.issuer))
-        .push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: totp.value.join() });
+        .push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: handle_totp });
     });
   }
 
