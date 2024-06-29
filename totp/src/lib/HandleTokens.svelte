@@ -10,28 +10,29 @@
   
   let totp: Some<string[]> = some([]);
   let step = 0;
-  let struct_token: Array<StructToken> = Array.from([]);
+  let struct_token: Some<StructToken[]> = some([]);
   let tokens: Array<Token> = Array.from([]);
 
   async function display_tokens(): Promise<void> {
     const period: number = 30;
     const seconds: number = new Date().getSeconds();
     step = seconds < period ? period - seconds : period * 2 - seconds;
-  
-    totp = await option(Promise.all([invoke("generate_token")])) as Some<string[]>;
-    struct_token = await invoke("show_token");
+    
+    //Awaiting the invoke on "generate_token" will panic the token retrieve, custom error handling is used instead here.
+    totp = await option(Promise.resolve(invoke("generate_token"))) as Some<string[]>;
+    struct_token = await option(Promise.resolve(await invoke("show_token"))) as Some<StructToken[]>;
   }
 
   const delay: number = 1000;
   const token_timer = (): number => setInterval(display_tokens, delay);
   token_timer();
 
-  $: if (struct_token.length > 0) {
+  $: if (struct_token.value.length > 0) {
     tokens = [];
     const handle_totp: string = Array.isArray(totp.value) ? totp.value.join() : none;
 
     // biome-ignore lint/complexity/noForEach: <why making it yourself harder with a for of instead of a forEach?>
-    struct_token.forEach((x: StructToken) => {
+    struct_token.value.forEach((x: StructToken) => {
       tokens
         .sort((a: Token, b: Token) => a.issuer.localeCompare(b.issuer))
         .push({ id: x.id, placeholder: "vscode-icons:file-type-objidconfig", issuer: x.issuer, otp: handle_totp });
