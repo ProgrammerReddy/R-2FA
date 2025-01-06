@@ -30,7 +30,8 @@
     ? unmatch_regex : issuer.length > 50
     ? character_limit : check;
 
-  $: secret_err = secret.length === 0 ? empty : !secret.match(regex)
+  $: secret_err = secret.length === 0 ? empty : secret.length < 26 
+    ? "Secret to short!" : !secret.match(regex)
     ? unmatch_regex : secret.length > 64
     ? character_limit : !secret.match(base32) 
     ? unmatch_base32 : check;
